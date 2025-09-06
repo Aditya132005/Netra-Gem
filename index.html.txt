@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netra Kiran Optics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .gradient-bg {
+            background-image: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
+        }
+        .main-gradient-card {
+            background-image: linear-gradient(120deg, #818cf8 0%, #d8b4fe 100%);
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- App Container -->
+    <div id="app">
+
+        <!-- Landing Page -->
+        <div id="page-landing">
+            <div class="container mx-auto max-w-4xl p-4 md:p-8">
+                <div class="main-gradient-card text-white rounded-2xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center">
+                    <div class="flex-1 mb-6 md:mb-0 md:mr-8">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-2">Welcome to Netra Kiran Optics</h1>
+                        <p class="text-lg opacity-90">Your trusted partner for quality eyewear and eye care services</p>
+                    </div>
+                    <div class="flex-shrink-0 p-2 bg-white/30 rounded-2xl shadow-lg">
+                        <img src="https://images.pexels.com/photos/2811088/pexels-photo-2811088.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Happy customer with glasses" class="rounded-xl w-32 h-32 md:w-40 md:h-40 object-cover">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-8 mt-8">
+                    <h2 class="text-2xl font-bold text-violet-600 mb-4 text-center">Find Your Records</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="customer-search-input" type="search" placeholder="Search by name, phone, or email..." class="w-full px-4 py-3 bg-slate-100 rounded-lg focus:ring-2 focus:ring-violet-500 focus:outline-none transition">
+                        <button id="customer-search-btn" class="bg-violet-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-violet-700 transition shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2">Search</button>
+                    </div>
+                </div>
+                
+                <div id="search-results-container" class="bg-white rounded-2xl shadow-lg p-8 mt-8 hide">
+                    <!-- Search results will be injected here -->
+                </div>
+
+                <div class="bg-white/50 backdrop-blur-sm rounded-2xl p-8 mt-8 text-center">
+                     <h2 class="text-xl font-bold text-slate-600 mb-2">Admin Access</h2>
+                     <p class="text-slate-500 mb-4">Access the full management system to manage customers, orders, and more.</p>
+                    <a href="#admin" class="inline-block bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg hover:bg-slate-800 transition shadow hover:shadow-lg">Access Admin Panel</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="page-admin" class="hide">
+            <div class="flex h-screen bg-slate-100">
+                <!-- Sidebar -->
+                <aside class="w-64 bg-white shadow-md flex flex-col">
+                    <div class="p-6 text-2xl font-bold text-violet-700 border-b">Netra Kiran Admin</div>
+                    <nav class="flex-1 p-4 space-y-2">
+                        <a href="#dashboard" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                            <i data-lucide="layout-dashboard"></i> Dashboard
+                        </a>
+                        <a href="#customers" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                             <i data-lucide="users"></i> Customers
+                        </a>
+                        <a href="#orders" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                            <i data-lucide="shopping-cart"></i> Orders
+                        </a>
+                        <a href="#appointments" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                            <i data-lucide="calendar"></i> Appointments
+                        </a>
+                        <a href="#reports" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                           <i data-lucide="bar-chart-2"></i> Reports
+                        </a>
+                    </nav>
+                     <div class="p-4 border-t">
+                        <a href="#settings" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-violet-100 hover:text-violet-700 transition">
+                           <i data-lucide="settings"></i> Settings
+                        </a>
+                         <a href="#landing" id="logout-btn" class="flex items-center gap-3 px-4 py-2 mt-2 rounded-lg text-red-500 hover:bg-red-100 transition">
+                           <i data-lucide="log-out"></i> Logout
+                        </a>
+                     </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="flex-1 p-8 overflow-y-auto">
+                    <!-- Dashboard View -->
+                    <div id="view-dashboard" class="admin-view">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+                            <button id="dashboard-add-customer-btn" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition shadow flex items-center gap-2">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Customer
+                            </button>
+                        </div>
+                        
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-blue-500 text-white p-6 rounded-xl shadow-lg">
+                                <h3 class="text-lg font-semibold">Total Customers</h3>
+                                <p id="total-customers" class="text-4xl font-bold">0</p>
+                                <p class="opacity-80">Active customers in the system</p>
+                            </div>
+                            <div class="bg-green-500 text-white p-6 rounded-xl shadow-lg">
+                                <h3 class="text-lg font-semibold">Recent Orders</h3>
+                                <p id="recent-orders-count" class="text-4xl font-bold">0</p>
+                                <p class="opacity-80">Last 5 orders</p>
+                            </div>
+                            <div class="bg-purple-500 text-white p-6 rounded-xl shadow-lg">
+                                <h3 class="text-lg font-semibold">Today's Appointments</h3>
+                                <p id="todays-appointments" class="text-4xl font-bold">0</p>
+                                <p class="opacity-80">Scheduled for today</p>
+                            </div>
+                        </div>
+
+                        <!-- Shortcut Cards -->
+                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                             <a href="#customers/add" class="shortcut-link bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between hover:ring-2 hover:ring-blue-500">
+                                 <div>
+                                     <h4 class="font-bold text-lg">Add Customer</h4>
+                                     <p class="text-slate-500">Register a new customer</p>
+                                 </div>
+                                 <i data-lucide="plus-circle" class="text-blue-500"></i>
+                             </a>
+                            <a href="#customers" class="shortcut-link bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between hover:ring-2 hover:ring-violet-500">
+                                 <div>
+                                     <h4 class="font-bold text-lg">View Customers</h4>
+                                     <p class="text-slate-500">Browse all customers</p>
+                                 </div>
+                                 <i data-lucide="users" class="text-violet-500"></i>
+                             </a>
+                            <a href="#orders" class="shortcut-link bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between hover:ring-2 hover:ring-green-500">
+                                 <div>
+                                     <h4 class="font-bold text-lg">Manage Orders</h4>
+                                     <p class="text-slate-500">View and process orders</p>
+                                 </div>
+                                 <i data-lucide="shopping-cart" class="text-green-500"></i>
+                             </a>
+                             <a href="#reports" class="shortcut-link bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between hover:ring-2 hover:ring-yellow-500">
+                                 <div>
+                                     <h4 class="font-bold text-lg">View Reports</h4>
+                                     <p class="text-slate-500">Access business analytics</p>
+                                 </div>
+                                 <i data-lucide="bar-chart-2" class="text-yellow-500"></i>
+                             </a>
+                         </div>
+                        
+                        <!-- Recent Orders Table -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4">Recent Orders</h2>
+                            <div id="recent-orders-list" class="bg-white p-4 rounded-xl shadow-md">
+                                <p class="text-slate-500 text-center py-8">No recent orders found.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Customers View -->
+                    <div id="view-customers" class="admin-view hide">
+                         <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold">Customers</h1>
+                            <button id="customers-add-customer-btn" class="bg-blue-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-blue-700 transition shadow flex items-center gap-2">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Customer
+                            </button>
+                        </div>
+                        <div id="customers-list" class="bg-white rounded-xl shadow-md p-4">
+                           <p class="text-slate-500 text-center py-8">No customers found.</p>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Customer View -->
+                    <div id="view-add-customer" class="admin-view hide">
+                        <button class="back-to-customers-btn flex items-center gap-2 text-slate-600 hover:text-slate-900 font-semibold mb-6">
+                            <i data-lucide="arrow-left"></i> Back
+                        </button>
+                        <h1 id="customer-form-title" class="text-3xl font-bold mb-6">Add Customer</h1>
+                        <form id="add-customer-form" class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
+                            <input type="hidden" id="customer-id">
+                            <div class="flex border-b mb-6">
+                                <button type="button" data-tab="basic-info" class="customer-form-tab py-3 px-6 font-semibold border-b-2 border-violet-600 text-violet-600">Basic Info</button>
+                                <button type="button" data-tab="eye-prescription" class="customer-form-tab py-3 px-6 font-semibold border-b-2 border-transparent text-slate-500">Eye Prescription</button>
+                            </div>
+
+                            <!-- Basic Info Tab -->
+                            <div id="tab-basic-info" class="form-tab-content space-y-4">
+                                <div>
+                                    <label for="full-name" class="block text-sm font-medium text-slate-700">Full Name *</label>
+                                    <input type="text" id="full-name" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="phone-number" class="block text-sm font-medium text-slate-700">Phone Number *</label>
+                                        <input type="tel" id="phone-number" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500">
+                                    </div>
+                                    <div>
+                                        <label for="email-address" class="block text-sm font-medium text-slate-700">Email Address</label>
+                                        <input type="email" id="email-address" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="address" class="block text-sm font-medium text-slate-700">Address</label>
+                                    <textarea id="address" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500"></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     <div>
+                                        <label for="date-of-visit" class="block text-sm font-medium text-slate-700">Date of Visit *</label>
+                                        <input type="date" id="date-of-visit" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500">
+                                    </div>
+                                    <div>
+                                        <label for="consultancy-fee" class="block text-sm font-medium text-slate-700">Consultancy Fee (₹)</label>
+                                        <input type="number" id="consultancy-fee" value="0" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Eye Prescription Tab -->
+                            <div id="tab-eye-prescription" class="form-tab-content space-y-6 hide">
+                                <div class="flex items-center">
+                                    <input id="include-prescription" type="checkbox" class="h-4 w-4 text-violet-600 border-slate-300 rounded focus:ring-violet-500">
+                                    <label for="include-prescription" class="ml-2 block text-sm text-slate-900">Include eye prescription with customer record</label>
+                                </div>
+
+                                <div id="prescription-fields" class="space-y-6 hide">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Right Eye -->
+                                        <fieldset class="border rounded-lg p-4">
+                                            <legend class="px-2 font-semibold">Right Eye (OD)</legend>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div><label class="text-sm">Sphere (SPH)</label><input type="text" id="od-sph" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Cylinder (CYL)</label><input type="text" id="od-cyl" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Axis</label><input type="text" id="od-axis" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Add</label><input type="text" id="od-add" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                            </div>
+                                        </fieldset>
+                                        <!-- Left Eye -->
+                                        <fieldset class="border rounded-lg p-4">
+                                            <legend class="px-2 font-semibold">Left Eye (OS)</legend>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div><label class="text-sm">Sphere (SPH)</label><input type="text" id="os-sph" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Cylinder (CYL)</label><input type="text" id="os-cyl" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Axis</label><input type="text" id="os-axis" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                                <div><label class="text-sm">Add</label><input type="text" id="os-add" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div><label class="text-sm">PD Distance (mm)</label><input type="text" id="pd-distance" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                        <div><label class="text-sm">PD Near (mm)</label><input type="text" id="pd-near" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                    </div>
+                                     <div><label class="text-sm">Doctor's Name</label><input type="text" id="doctor-name" placeholder="Dr. Name" class="w-full mt-1 border-slate-300 rounded-md"></div>
+                                     <div><label class="text-sm">Prescription Notes</label><textarea id="prescription-notes" rows="3" class="w-full mt-1 border-slate-300 rounded-md"></textarea></div>
+                                     <div class="mt-6 text-center border-t pt-6">
+                                        <button type="button" id="gemini-frame-recommendation-btn" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:from-purple-600 hover:to-indigo-700 transition shadow">
+                                            ✨ Get Frame Recommendations
+                                        </button>
+                                    </div>
+                                    <div id="gemini-recommendation-result" class="mt-4 p-4 bg-slate-50 rounded-lg hide">
+                                        <!-- Gemini results go here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+                                <button type="button" class="back-to-customers-btn px-6 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300">Cancel</button>
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">Add Customer</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Placeholder Views -->
+                    <div id="view-orders" class="admin-view hide"><h1 class="text-3xl font-bold">Orders</h1></div>
+                    <div id="view-appointments" class="admin-view hide"><h1 class="text-3xl font-bold">Appointments</h1></div>
+                    <div id="view-reports" class="admin-view hide">
+                        <h1 class="text-3xl font-bold mb-6">Reports</h1>
+
+                        <!-- Create Report Form -->
+                        <div class="bg-white rounded-xl shadow-lg p-8 mb-8 max-w-3xl mx-auto">
+                            <h2 class="text-2xl font-bold mb-4">Create New Report</h2>
+                            <form id="create-report-form" class="space-y-4">
+                                <div>
+                                    <label for="report-text" class="block text-sm font-medium text-slate-700">Report Content</label>
+                                    <textarea id="report-text" rows="6" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" placeholder="Write your report details here..."></textarea>
+                                </div>
+                                <div>
+                                    <label for="report-image" class="block text-sm font-medium text-slate-700">Upload Image</label>
+                                    <input type="file" id="report-image" accept="image/*" class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                                    <p class="text-xs text-slate-500 mt-1">Note: Image upload is for demonstration. A full backend is needed for actual storage.</p>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">Save Report</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Saved Reports List -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-4">Saved Reports</h2>
+                            <div id="saved-reports-list" class="space-y-4">
+                                <p class="text-slate-500 text-center py-8">No reports found.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="view-settings" class="admin-view hide"><h1 class="text-3xl font-bold">Settings</h1></div>
+                </main>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SUPABASE CONFIGURATION ---
+        const SUPABASE_URL = 'https://micqrabziddltctpcncr.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pY3FyYWJ6aWRkbHRjdHBjbmNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzcxODIsImV4cCI6MjA3MjY1MzE4Mn0.rbvFlrFdHIwyinVt2yuXAWqPKpZ9aaaptwxXsYJF76Q';
+        
+        let db;
+
+        if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+            document.getElementById('app').innerHTML = `
+                <div class="h-screen w-screen flex items-center justify-center bg-slate-100">
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-lg mx-4">
+                        <h1 class="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
+                        <p class="text-slate-700">Please update the <strong>SUPABASE_URL</strong> and <strong>SUPABASE_ANON_KEY</strong> variables in the HTML file with your project's credentials.</p>
+                        <p class="mt-2 text-sm text-slate-500">You can find these in your Supabase project's API settings.</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            // --- SUPABASE INITIALIZATION ---
+            const { createClient } = supabase;
+            db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // --- GLOBAL STATE ---
+            let customers = [];
+            let orders = [];
+            let appointments = [];
+            let reports = [];
+
+            // --- GEMINI API CALL ---
+            async function callGemini(prompt) {
+                const apiKey = ""; // Canvas will provide this
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status: ${response.status} ${await response.text()}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        console.warn("Gemini response was empty or malformed", result);
+                        return "Sorry, I couldn't generate a response. The result was empty.";
+                    }
+                } catch (error) {
+                    console.error("Gemini API call error:", error);
+                    return "An error occurred while contacting the AI. Please check the console for details.";
+                }
+            }
+
+
+            // --- DATA FETCHING ---
+            async function fetchCustomers() {
+                const { data, error } = await db.from('customers').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error fetching customers:', error);
+                    return;
+                }
+                customers = data;
+                console.log("Customers updated:", customers);
+                renderDashboard();
+                if (document.getElementById('view-customers').offsetParent !== null) {
+                    renderCustomersList();
+                }
+            }
+
+            async function fetchReports() {
+                const { data, error } = await db.from('reports').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error fetching reports:', error);
+                    return;
+                }
+                reports = data;
+                console.log("Reports updated:", reports);
+                if (document.getElementById('view-reports').offsetParent !== null) {
+                    renderReportsList();
+                }
+            }
+            
+            // --- REAL-TIME SUBSCRIPTIONS ---
+            function setupSubscriptions() {
+                db.channel('public:customers')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, payload => {
+                    console.log('Customer change received!', payload);
+                    fetchCustomers();
+                })
+                .subscribe();
+                
+                db.channel('public:reports')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, payload => {
+                    console.log('Report change received!', payload);
+                    fetchReports();
+                })
+                .subscribe();
+            }
+
+            // --- NAVIGATION / ROUTING ---
+            const pages = ['landing', 'admin'];
+            const adminViews = ['dashboard', 'customers', 'add-customer', 'orders', 'appointments', 'reports', 'settings'];
+
+            function navigateTo(path) {
+                const [mainPage, subView] = path.split('/');
+                
+                pages.forEach(p => document.getElementById(`page-${p}`).classList.add('hide'));
+                if (document.getElementById(`page-${mainPage}`)) {
+                    document.getElementById(`page-${mainPage}`).classList.remove('hide');
+                }
+
+                if (mainPage === 'admin') {
+                    adminViews.forEach(v => document.getElementById(`view-${v}`).classList.add('hide'));
+                    const viewToShow = subView ? `view-${subView}` : 'view-dashboard';
+                    if (document.getElementById(viewToShow)) {
+                        document.getElementById(viewToShow).classList.remove('hide');
+                    }
+                    
+                    document.querySelectorAll('.nav-link.bg-violet-100').forEach(el => el.classList.remove('bg-violet-100', 'text-violet-700'));
+                    const activeLink = document.querySelector(`.nav-link[href="#${subView || 'dashboard'}"]`);
+                    if(activeLink) activeLink.classList.add('bg-violet-100', 'text-violet-700');
+
+                    if(viewToShow === 'view-reports') renderReportsList();
+                    if(viewToShow === 'view-customers') renderCustomersList();
+                }
+
+                lucide.createIcons();
+            }
+
+            function handleHashChange() {
+                let hash = window.location.hash.substring(1) || 'landing';
+                navigateTo(hash);
+            }
+
+            window.addEventListener('hashchange', handleHashChange);
+            window.addEventListener('load', async () => {
+                handleHashChange();
+                await fetchCustomers();
+                await fetchReports();
+                setupSubscriptions();
+            });
+            
+            // --- RENDERING FUNCTIONS ---
+            function renderDashboard() {
+                document.getElementById('total-customers').textContent = customers.length;
+            }
+
+            function renderCustomersList() {
+                const container = document.getElementById('customers-list');
+                if (customers.length === 0) {
+                    container.innerHTML = `<p class="text-slate-500 text-center py-8">No customers found. Click 'Add Customer' to get started.</p>`;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="w-full text-left">
+                        <thead class="border-b">
+                            <tr>
+                                <th class="p-4">Name</th>
+                                <th class="p-4 hidden md:table-cell">Contact</th>
+                                <th class="p-4 hidden lg:table-cell">Last Visit</th>
+                                <th class="p-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${customers.map(c => `
+                                <tr class="border-b hover:bg-slate-50">
+                                    <td class="p-4">
+                                        <div class="font-semibold">${c.fullname}</div>
+                                    </td>
+                                    <td class="p-4 hidden md:table-cell">
+                                        <div>${c.phone}</div>
+                                        <div class="text-sm text-slate-500">${c.email}</div>
+                                    </td>
+                                    <td class="p-4 hidden lg:table-cell">${new Date(c.visitdate).toLocaleDateString()}</td>
+                                    <td class="p-4">
+                                        <button data-id="${c.id}" class="edit-customer-btn text-blue-600 hover:text-blue-800 mr-2"><i data-lucide="edit" class="w-5 h-5"></i></button>
+                                        <button data-id="${c.id}" class="delete-customer-btn text-red-600 hover:text-red-800"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                lucide.createIcons();
+            }
+            
+            function renderReportsList() {
+                const container = document.getElementById('saved-reports-list');
+                if (reports.length === 0) {
+                    container.innerHTML = `<div class="bg-white rounded-xl shadow p-8"><p class="text-slate-500 text-center">No reports found.</p></div>`;
+                    return;
+                }
+
+                container.innerHTML = reports.map(report => `
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <p class="text-xs text-slate-400 mb-2">${new Date(report.created_at).toLocaleString()}</p>
+                        <p class="text-slate-600 whitespace-pre-wrap">${report.text}</p>
+                        ${report.imagename ? `
+                        <div class="mt-4 border-t pt-4">
+                            <p class="text-sm font-semibold text-slate-700">Attached Image:</p>
+                            <div class="flex items-center gap-2 mt-2 text-slate-500">
+                                <i data-lucide="image" class="w-4 h-4"></i>
+                                <span>${report.imagename} (preview not available)</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+
+            function renderCustomerSearchResults(results) {
+                const container = document.getElementById('search-results-container');
+                container.classList.remove('hide');
+
+                if (results.length === 0) {
+                    container.innerHTML = `<h3 class="text-xl font-bold mb-4">Search Results</h3><p class="text-slate-500">No records found.</p>`;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">Search Results</h3>
+                    ${results.map(customer => `
+                        <div class="border rounded-lg p-6 mb-4">
+                            <div class="flex flex-col md:flex-row justify-between">
+                            <div>
+                                    <h4 class="text-2xl font-bold">${customer.fullname}</h4>
+                                    <p class="text-slate-600">Phone: ${customer.phone}</p>
+                                    <p class="text-slate-600">Email: ${customer.email || 'N/A'}</p>
+                                    <p class="text-slate-600">Last Visit: ${new Date(customer.visitdate).toLocaleDateString()}</p>
+                            </div>
+                                ${customer.prescription ? `<div class="text-right mt-4 md:mt-0"><span class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">Dr. ${customer.prescription.doctorName || 'N/A'}</span></div>` : ''}
+                            </div>
+                            
+                            ${customer.prescription ? `
+                            <div class="border-t mt-6 pt-4">
+                                <h5 class="font-semibold mb-2 text-violet-700">Prescription Details (Date: ${new Date(customer.visitdate).toLocaleDateString()})</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                                    <div class="font-bold">Right Eye (OD)</div><div class="font-bold">Left Eye (OS)</div>
+                                    <div>Sphere: ${customer.prescription.od_sph || 'N/A'}</div><div>Sphere: ${customer.prescription.os_sph || 'N/A'}</div>
+                                    <div>Cylinder: ${customer.prescription.od_cyl || 'N/A'}</div><div>Cylinder: ${customer.prescription.os_cyl || 'N/A'}</div>
+                                    <div>Axis: ${customer.prescription.od_axis || 'N/A'}</div><div>Axis: ${customer.prescription.os_axis || 'N/A'}</div>
+                                </div>
+                                ${customer.prescription.notes ? `<p class="mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded-md"><strong>Notes:</strong> ${customer.prescription.notes}</p>` : ''}
+                                <div class="mt-4 text-right">
+                                    <button data-id="${customer.id}" class="gemini-explain-prescription-btn inline-flex items-center gap-2 bg-slate-200 text-slate-800 font-semibold px-4 py-2 rounded-lg hover:bg-slate-300 transition">
+                                        ✨ Explain My Prescription
+                                    </button>
+                                </div>
+                                <div id="gemini-explanation-${customer.id}" class="mt-4 p-4 bg-violet-50 rounded-lg hide">
+                                </div>
+                            </div>
+                            ` : '<p class="mt-4 text-slate-500">No prescription on file for this visit.</p>'}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            function resetCustomerForm() {
+                const form = document.getElementById('add-customer-form');
+                if (form) form.reset();
+
+                const customerIdInput = document.getElementById('customer-id');
+                if (customerIdInput) customerIdInput.value = '';
+
+                const title = document.getElementById('customer-form-title');
+                if (title) title.textContent = 'Add Customer';
+
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) submitButton.textContent = 'Add Customer';
+                
+                const prescriptionFields = document.getElementById('prescription-fields');
+                if (prescriptionFields) prescriptionFields.classList.add('hide');
+
+                const recommendationResult = document.getElementById('gemini-recommendation-result');
+                if (recommendationResult) {
+                    recommendationResult.classList.add('hide');
+                    recommendationResult.innerHTML = '';
+                }
+                
+                switchFormTab('basic-info');
+            }
+
+            function populateCustomerForm(customerId) {
+                const customer = customers.find(c => c.id == customerId);
+                if (!customer) return;
+
+                resetCustomerForm();
+                document.getElementById('customer-form-title').textContent = 'Edit Customer';
+                document.querySelector('#add-customer-form button[type="submit"]').textContent = 'Save Changes';
+                document.getElementById('customer-id').value = customer.id;
+
+                document.getElementById('full-name').value = customer.fullname || '';
+                document.getElementById('phone-number').value = customer.phone || '';
+                document.getElementById('email-address').value = customer.email || '';
+                document.getElementById('address').value = customer.address || '';
+                document.getElementById('date-of-visit').value = customer.visitdate || '';
+                document.getElementById('consultancy-fee').value = customer.consultancyfee || 0;
+
+                if (customer.prescription) {
+                    document.getElementById('include-prescription').checked = true;
+                    document.getElementById('prescription-fields').classList.remove('hide');
+                    document.getElementById('od-sph').value = customer.prescription.od_sph || '';
+                    document.getElementById('od-cyl').value = customer.prescription.od_cyl || '';
+                    document.getElementById('od-axis').value = customer.prescription.od_axis || '';
+                    document.getElementById('od-add').value = customer.prescription.od_add || '';
+                    document.getElementById('os-sph').value = customer.prescription.os_sph || '';
+                    document.getElementById('os-cyl').value = customer.prescription.os_cyl || '';
+                    document.getElementById('os-axis').value = customer.prescription.os_axis || '';
+                    document.getElementById('os-add').value = customer.prescription.os_add || '';
+                    document.getElementById('pd-distance').value = customer.prescription.pd_distance || '';
+                    document.getElementById('pd-near').value = customer.prescription.pd_near || '';
+                    document.getElementById('doctor-name').value = customer.prescription.doctorName || '';
+                    document.getElementById('prescription-notes').value = customer.prescription.notes || '';
+                }
+                
+                window.location.hash = '#admin/add-customer';
+            }
+            
+            function switchFormTab(tabName) {
+                document.querySelectorAll('.form-tab-content').forEach(el => el.classList.add('hide'));
+                const tabContent = document.getElementById(`tab-${tabName}`);
+                if (tabContent) tabContent.classList.remove('hide');
+
+                document.querySelectorAll('.customer-form-tab').forEach(el => {
+                    el.classList.remove('border-violet-600', 'text-violet-600');
+                    el.classList.add('border-transparent', 'text-slate-500');
+                });
+                const activeTab = document.querySelector(`.customer-form-tab[data-tab="${tabName}"]`);
+                if(activeTab) activeTab.classList.add('border-violet-600', 'text-violet-600');
+            }
+
+            // --- EVENT HANDLERS ---
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.hash = '#landing';
+            });
+
+            document.getElementById('dashboard-add-customer-btn').addEventListener('click', () => {
+                resetCustomerForm();
+                window.location.hash = '#admin/add-customer';
+            });
+            document.getElementById('customers-add-customer-btn').addEventListener('click', () => {
+                resetCustomerForm();
+                window.location.hash = '#admin/add-customer';
+            });
+            
+            document.querySelectorAll('.shortcut-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetHash = this.getAttribute('href');
+                    if (targetHash.includes('/add')) {
+                        resetCustomerForm();
+                    }
+                    window.location.hash = targetHash;
+                });
+            });
+
+            document.querySelectorAll('.back-to-customers-btn').forEach(btn => {
+                btn.addEventListener('click', () => window.location.hash = '#admin/customers');
+            });
+
+            document.querySelectorAll('.customer-form-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchFormTab(tab.dataset.tab));
+            });
+
+            document.getElementById('include-prescription').addEventListener('change', (e) => {
+                const prescriptionFields = document.getElementById('prescription-fields');
+                if (e.target.checked) {
+                    prescriptionFields.classList.remove('hide');
+                } else {
+                    prescriptionFields.classList.add('hide');
+                }
+            });
+
+            document.getElementById('add-customer-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const customerId = document.getElementById('customer-id').value;
+                const customerData = {
+                    fullname: document.getElementById('full-name').value,
+                    phone: document.getElementById('phone-number').value,
+                    email: document.getElementById('email-address').value,
+                    address: document.getElementById('address').value,
+                    visitdate: document.getElementById('date-of-visit').value,
+                    consultancyfee: parseFloat(document.getElementById('consultancy-fee').value) || 0,
+                    prescription: null,
+                };
+
+                if (document.getElementById('include-prescription').checked) {
+                    customerData.prescription = {
+                        od_sph: document.getElementById('od-sph').value,
+                        od_cyl: document.getElementById('od-cyl').value,
+                        od_axis: document.getElementById('od-axis').value,
+                        od_add: document.getElementById('od-add').value,
+                        os_sph: document.getElementById('os-sph').value,
+                        os_cyl: document.getElementById('os-cyl').value,
+                        os_axis: document.getElementById('os-axis').value,
+                        os_add: document.getElementById('os-add').value,
+                        pd_distance: document.getElementById('pd-distance').value,
+                        pd_near: document.getElementById('pd-near').value,
+                        doctorName: document.getElementById('doctor-name').value,
+                        notes: document.getElementById('prescription-notes').value,
+                    };
+                }
+                
+                let result;
+                if (customerId) {
+                    // Update
+                    result = await db.from('customers').update(customerData).eq('id', customerId);
+                } else {
+                    // Insert
+                    result = await db.from('customers').insert([customerData]);
+                }
+
+                if (result.error) {
+                    console.error("Error saving customer: ", result.error);
+                } else {
+                    window.location.hash = '#admin/customers';
+                }
+            });
+            
+            document.getElementById('create-report-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const reportText = document.getElementById('report-text').value;
+                const imageFile = document.getElementById('report-image').files[0];
+
+                const reportData = {
+                    text: reportText,
+                    imagename: imageFile ? imageFile.name : null,
+                    // In a real app, you would upload the image to Supabase Storage
+                    // and store the public URL here.
+                };
+
+                const { error } = await db.from('reports').insert([reportData]);
+
+                if (error) {
+                    console.error("Error saving report: ", error);
+                } else {
+                    document.getElementById('create-report-form').reset();
+                }
+            });
+
+            document.getElementById('customers-list').addEventListener('click', async (e) => {
+                const editBtn = e.target.closest('.edit-customer-btn');
+                const deleteBtn = e.target.closest('.delete-customer-btn');
+
+                if (editBtn) {
+                    const customerId = editBtn.dataset.id;
+                    populateCustomerForm(customerId);
+                }
+
+                if (deleteBtn) {
+                    const customerId = deleteBtn.dataset.id;
+                    const { error } = await db.from('customers').delete().eq('id', customerId);
+                    if (error) {
+                        console.error("Error deleting customer: ", error);
+                    }
+                }
+            });
+            
+            document.getElementById('customer-search-btn').addEventListener('click', async () => {
+                const searchTerm = document.getElementById('customer-search-input').value.trim().toLowerCase();
+                if(!searchTerm) {
+                    renderCustomerSearchResults([]);
+                    return;
+                }
+
+                const results = customers.filter(c => 
+                    c.fullname.toLowerCase().includes(searchTerm) ||
+                    c.phone.includes(searchTerm) ||
+                    (c.email && c.email.toLowerCase().includes(searchTerm))
+                );
+                
+                renderCustomerSearchResults(results);
+            });
+
+            // --- GEMINI EVENT HANDLERS ---
+            document.getElementById('gemini-frame-recommendation-btn').addEventListener('click', async () => {
+                const prescription = {
+                    od_sph: document.getElementById('od-sph').value || 'N/A',
+                    od_cyl: document.getElementById('od-cyl').value || 'N/A',
+                    od_axis: document.getElementById('od-axis').value || 'N/A',
+                    od_add: document.getElementById('od-add').value || 'N/A',
+                    os_sph: document.getElementById('os-sph').value || 'N/A',
+                    os_cyl: document.getElementById('os-cyl').value || 'N/A',
+                    os_axis: document.getElementById('os-axis').value || 'N/A',
+                    os_add: document.getElementById('os-add').value || 'N/A',
+                };
+
+                const prompt = `Act as an expert optician. Based on the following eye prescription, provide recommendations for eyeglass lenses and frame styles. Be friendly and professional.
+                
+                Right Eye (OD): SPH: ${prescription.od_sph}, CYL: ${prescription.od_cyl}, Axis: ${prescription.od_axis}, Add: ${prescription.od_add}
+                Left Eye (OS): SPH: ${prescription.os_sph}, CYL: ${prescription.os_cyl}, Axis: ${prescription.os_axis}, Add: ${prescription.os_add}
+
+                Consider the lens thickness, especially for higher sphere values (stronger prescriptions), and suggest suitable lens materials (like high-index for thinner lenses). Also, recommend frame materials (e.g., plastic, metal, titanium) and shapes (e.g., rectangular, round, cat-eye) that would be a good fit. Format the response clearly with headings for 'Lens Recommendations' and 'Frame Recommendations'.`;
+
+                const resultContainer = document.getElementById('gemini-recommendation-result');
+                resultContainer.classList.remove('hide');
+                resultContainer.innerHTML = '<p class="text-center text-slate-500 animate-pulse">✨ Thinking...</p>';
+                
+                const recommendation = await callGemini(prompt);
+                
+                resultContainer.innerHTML = `<p class="text-slate-700 whitespace-pre-wrap">${recommendation}</p>`;
+            });
+
+            document.getElementById('search-results-container').addEventListener('click', async (e) => {
+                const explainBtn = e.target.closest('.gemini-explain-prescription-btn');
+                if (explainBtn) {
+                    const customerId = explainBtn.dataset.id;
+                    const customer = customers.find(c => c.id == customerId);
+
+                    if (!customer || !customer.prescription) return;
+                    
+                    const p = customer.prescription;
+                    const prompt = `Act as a friendly optician explaining an eye prescription to a patient in simple, easy-to-understand terms. Avoid overly technical jargon.
+                    
+                    Here is the prescription:
+                    Right Eye (OD): Sphere (SPH): ${p.od_sph || 'N/A'}, Cylinder (CYL): ${p.od_cyl || 'N/A'}, Axis: ${p.od_axis || 'N/A'}
+                    Left Eye (OS): Sphere (SPH): ${p.os_sph || 'N/A'}, Cylinder (CYL): ${p.os_cyl || 'N/A'}, Axis: ${p.os_axis || 'N/A'}
+
+                    Explain what Sphere (for nearsightedness/farsightedness) and Cylinder (for astigmatism) mean based on these numbers. Keep the explanation concise and reassuring.`;
+
+                    const resultContainer = document.getElementById(`gemini-explanation-${customerId}`);
+                    resultContainer.classList.remove('hide');
+                    resultContainer.innerHTML = '<p class="text-center text-slate-500 animate-pulse">✨ Preparing explanation...</p>';
+
+                    const explanation = await callGemini(prompt);
+                    resultContainer.innerHTML = `<p class="text-slate-700 whitespace-pre-wrap">${explanation}</p>`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
